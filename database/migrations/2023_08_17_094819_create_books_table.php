@@ -16,11 +16,11 @@ return new class extends Migration
         Schema::create('books', function (Blueprint $table) {
             $table->id();
             $table->string('book_encrypted_id', 50)->unique();
-            $table->string('image');
+            $table->string('image')->nullable();
             $table->string('title', 30);
             $table->string('author', 30);
             $table->integer('price');
-            $table->string('categories');
+            $table->string('category');
             $table->string('description');
 
             $table->timestamps();

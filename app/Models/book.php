@@ -4,8 +4,6 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use App\Models\order;
-use App\Models\ratings_and_reviews;
 
 class book extends Model
 {
@@ -17,7 +15,7 @@ class book extends Model
         'title',
         'author',
         'price',
-        'categories',
+        'category',
         'description',
     ];
 

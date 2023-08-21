@@ -8,8 +8,6 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 use Tymon\JWTAuth\Contracts\JWTSubject;
-use App\Models\order;
-use App\Models\ratings_and_reviews;
 
 class User extends Authenticatable implements JWTSubject
 {
@@ -24,6 +22,7 @@ class User extends Authenticatable implements JWTSubject
         'encrypted_id',
         'name',
         'email',
+        'role',
         'password',
 
     ];

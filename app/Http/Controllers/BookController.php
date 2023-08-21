@@ -12,17 +12,17 @@ class BookController extends Controller
 {
     public function addBook(BookRequest $request)                          //add the book
     {
-        $imagePath = $this->saveImageFromUrl($request->file('image'));  //call the saveImageFromUrl function 
+        $imagePath = $this->saveImageFromFile($request->file('image'));  //call the saveImageFromUrl function
 
         try {
 
-            $book = book::create([                                   
+            $book = book::create([
                 'book_encrypted_id' => Str::uuid()->toString(),
                 'image' => $imagePath,
                 'title' => $request->input('title'),
                 'author' => $request->input('author'),
                 'price' => $request->input('price'),
-                'categories' => $request->input('categories'),
+                'category' => $request->input('category'),
                 'description' => $request->input('description'),
 
             ]);
@@ -55,9 +55,9 @@ class BookController extends Controller
         }
     }
 
-    public function searchBook($categories)              //search the book
+    public function searchBook($category)              //search the book
     {
-        $book = book::where('categories', 'like', "%$categories%")->get();     //get the book data where category is found
+        $book = book::where('category', 'like', "%$category%")->get();     //get the book data where category is found
 
         if ($book->isEmpty()) {
             return response()->json(['message' => 'No book found for the given username'], 404);
@@ -69,7 +69,7 @@ class BookController extends Controller
     public function updateBook(Request $request, $id)                     //update the book data
     {
         $book = book::where('id', $id)->first();                          //get data of specfic id
-        $imagePath = $this->saveImageFromUrl($request->file('image'));
+        $imagePath = $this->saveImageFromFile($request->file('image'));
 
         if (! $book) {
             return response()->json(['error' => 'book not found'], 404);
@@ -80,7 +80,7 @@ class BookController extends Controller
             'title' => $request->input('title'),
             'author' => $request->input('author'),
             'price' => $request->input('price'),
-            'categories' => $request->input('categories'),
+            'category' => $request->input('category'),
             'description' => $request->input('description'),
 
         ];
@@ -107,10 +107,11 @@ class BookController extends Controller
         return response()->json(['message' => 'book deleted successfully']);
     }
 
-    private function saveImageFromUrl($imageUrl)
+    private function saveImageFromFile($imageFile)
     {
-        if (! empty($imageUrl)) {
-            $imageData = file_get_contents($imageUrl);          //get all data of file 
+
+        if (! empty($imageFile)) {
+            $imageData = file_get_contents($imageFile->path());          //get all data of file
             $filename = uniqid().'.png';                        //generate random id
             $userDirectory = 'images/';
             Storage::put($userDirectory.'/'.$filename, $imageData);       //save the image in store
@@ -120,6 +121,34 @@ class BookController extends Controller
         }
 
         return null;
+    }
 
+    public function updateOrCreateImage(Request $request)
+    {
+        $bookId = $request->input('book_id');
+        $imagePath = $this->saveImageFromFile($request->file('image'));  // Call the saveImageFromUrl function
+
+        try {
+            $book = Book::where('id', $bookId)->first();
+
+            if (! $book) {
+                return response()->json(['message' => 'Book not found'], 404);
+            }
+
+            if ($imagePath) {
+                // Delete previous image if it exists
+                if ($book->image) {
+                    Storage::delete($book->image);
+                }
+
+                // Update the image path
+                $book->image = $imagePath;
+                $book->save();
+            }
+
+            return response()->json(['message' => 'Image updated successfully', 'book' => $book], 200);
+        } catch (\Exception $e) {
+            return response()->json(['error' => $e->getMessage()], 500);
+        }
     }
 }

@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\userRequest;
 use App\Mail\VerificationEmail;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -11,7 +10,7 @@ use Illuminate\Support\Str;
 
 class UserController extends Controller
 {
-    public function registerUser(userRequest $request)              //register user
+    public function registerUser(Request $request)              //register user
     {
 
         try {
@@ -27,6 +26,7 @@ class UserController extends Controller
                 'encrypted_id' => Str::uuid()->toString(),
                 'name' => $request->input('name'),
                 'email' => $request->input('email'),
+                'role' => $request->input('role'),
                 'password' => bcrypt($request->input('password')),
             ]);
 
