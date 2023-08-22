@@ -35,6 +35,11 @@ class book extends Model
         return $this->belongsToMany(order::class);
     }
 
+    public function category()
+    {
+        return $this->belongsTo(Category::class);
+    }
+
     public function ratings()
     {
         return $this->hasMany(ratings_and_reviews::class);

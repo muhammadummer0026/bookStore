@@ -4,31 +4,37 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\BookRequest;
 use App\Models\book;
+use App\Models\Category;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
 class BookController extends Controller
 {
-    public function addBook(BookRequest $request)                          //add the book
+    public function addBook(BookRequest $request)
     {
-        $imagePath = $this->saveImageFromFile($request->file('image'));  //call the saveImageFromUrl function
+        $imagePath = $this->saveImageFromFile($request->file('image'));
 
         try {
-
-            $book = book::create([
+            // Create the book
+            $book = Book::create([
                 'book_encrypted_id' => Str::uuid()->toString(),
                 'image' => $imagePath,
                 'title' => $request->input('title'),
                 'author' => $request->input('author'),
                 'price' => $request->input('price'),
-                'category' => $request->input('category'),
+                'category' => $request->input('category'), // Save category name
                 'description' => $request->input('description'),
+            ]);
 
+            // Get or create the categories and associate them with the book
+            Category::create([
+                'name' => $request->input('category'),
+                'book_id' => $book->id,
             ]);
 
             if ($book) {
-                return response()->json(['message' => 'book added sucessfully', 'book' => $book], 201);
+                return response()->json(['message' => 'Book added successfully', 'book' => $book], 201);
             } else {
                 return response()->json(['error' => 'Failed to add book'], 401);
             }
