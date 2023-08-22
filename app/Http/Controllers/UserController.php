@@ -30,6 +30,12 @@ class UserController extends Controller
                 'password' => bcrypt($request->input('password')),
             ]);
 
+            if ($user->role == 'admin') {
+                $user->assignRole('admin');
+            } else {
+                $user->assignRole('user');
+            }
+
             if ($user) {
                 // Generate the verification token after creating the user
                 $verificationToken = hash('sha256', $user->id.Str::random(40));           //sha(secure hash algorithm)

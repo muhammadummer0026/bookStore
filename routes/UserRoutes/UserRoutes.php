@@ -34,6 +34,12 @@ Route::middleware(['can:update_user'])->group(function () {
     Route::put('/users/{id}', 'UserController@updateUser');
 });
 
+use App\Http\Middleware\CheckDestroyUserPermission;
+
+Route::middleware(['can:destroy_user'])->group(function () {
+    Route::delete('/users/{id}', [UserController::class, 'destroyUser'])->middleware(CheckDestroyUserPermission::class);
+});
+
 Route::middleware(['can:destroy_user'])->group(function () {
     Route::delete('/users/{id}', 'UserController@destroyUser');
 });
